@@ -1,5 +1,8 @@
 import { fetchBooks } from '../api.js';
 
+// Mínimo de downloads para garantir que o livro é completo e relevante
+const MIN_DOWNLOADS = 50;
+
 export class Catalog {
   constructor(appContainer, onBookSelect) {
     this.container = appContainer;
@@ -12,12 +15,12 @@ export class Catalog {
     this.activeGenre = '';
 
     this.genres = [
-      { key: 'philosophy', label: 'PHILOSOPHY' },
-      { key: 'fiction', label: 'FICTION' },
-      { key: 'poetry', label: 'POETRY' },
-      { key: 'history', label: 'HISTORY' },
+      { key: 'filosofia', label: 'FILOSOFIA' },
+      { key: 'ficcao', label: 'FICÇÃO' },
+      { key: 'poesia', label: 'POESIA' },
+      { key: 'historia', label: 'HISTÓRIA' },
       { key: 'romance', label: 'ROMANCE' },
-      { key: 'science', label: 'SCIENCE' },
+      { key: 'ciencia', label: 'CIÊNCIA' },
       { key: 'drama', label: 'DRAMA' }
     ];
 
@@ -33,12 +36,12 @@ export class Catalog {
         <div class="hero-inner">
           <div class="hero-meta">
             <div class="brand-badge pixel-badge">LOGOS_BOOK.EXE</div>
-            <h1 class="title pixel-title">RETRO LIBRARY</h1>
-            <p class="tagline">// RETRIEVE CLASSICS IN HIGH RESOLUTION BITS.</p>
+            <h1 class="title pixel-title">BIBLIOTECA RETRO</h1>
+            <p class="tagline">// CLÁSSICOS DO DOMÍNIO PÚBLICO EM ALTA RESOLUÇÃO DE BITS.</p>
             
             <div class="search-wrap">
               <span class="search-icon">></span>
-              <input id="search-input" class="search pixel-search" type="search" placeholder="SEARCH TITLES, AUTHORS..." aria-label="Search Catalog">
+              <input id="search-input" class="search pixel-search" type="search" placeholder="BUSCAR TÍTULOS, AUTORES..." aria-label="Buscar Catálogo">
             </div>
             
             <div class="genres-wrapper">
@@ -47,7 +50,7 @@ export class Catalog {
           </div>
           <div class="hero-cover-wrap">
             <div class="hero-cover pixel-cover" id="featured-card">
-              <div class="featured-placeholder">BUFFERING FEATURED DATA...</div>
+              <div class="featured-placeholder">CARREGANDO DADOS EM DESTAQUE...</div>
             </div>
           </div>
         </div>
@@ -55,7 +58,7 @@ export class Catalog {
 
       <main class="grid-section">
         <div class="section-header">
-          <h2 class="section-title pixel-subtitle" id="catalog-title">POPULAR DATABASE</h2>
+          <h2 class="section-title pixel-subtitle" id="catalog-title">BANCO DE DADOS POPULAR</h2>
           <div class="pagination-controls" id="pagination-controls"></div>
         </div>
         <div class="grid" id="catalog-grid" role="list"></div>
@@ -119,10 +122,10 @@ export class Catalog {
   renderGenres() {
     this.genresPills.innerHTML = '';
     
-    // Pill padrão "ALL"
+    // Pill padrão "TODOS"
     const allPill = document.createElement('button');
     allPill.className = 'pill active';
-    allPill.textContent = 'ALL';
+    allPill.textContent = 'TODOS';
     allPill.addEventListener('click', () => {
       this.selectGenre(allPill, '');
     });
@@ -156,19 +159,26 @@ export class Catalog {
     this.showSkeletons();
     
     if (this.query) {
-      this.catalogTitle.textContent = `QUERY: "${this.query.toUpperCase()}"`;
+      this.catalogTitle.textContent = `BUSCA: "${this.query.toUpperCase()}"`;
     } else if (this.activeGenre) {
       const g = this.genres.find(x => x.key === this.activeGenre);
-      this.catalogTitle.textContent = g ? `SECTOR: ${g.label}` : 'DATABANK';
+      this.catalogTitle.textContent = g ? `SETOR: ${g.label}` : 'BANCO DE DADOS';
     } else {
-      this.catalogTitle.textContent = 'POPULAR DATABASE';
+      this.catalogTitle.textContent = 'BANCO DE DADOS POPULAR';
     }
 
     try {
-      const searchTerm = this.query || this.activeGenre || 'classics';
+      const searchTerm = this.query || this.activeGenre || 'classicos';
       const data = await fetchBooks(searchTerm, this.page);
       
-      this.books = data.results || [];
+      // Filtra livros com downloads mínimos (garantia de livro completo)
+      const allResults = data.results || [];
+      const filtered = allResults.filter(book => {
+        const downloads = book.download_count || 0;
+        return downloads >= MIN_DOWNLOADS;
+      });
+
+      this.books = filtered;
       this.loading = false;
       this.renderBooksGrid();
       this.renderPagination(data.count);
@@ -197,7 +207,7 @@ export class Catalog {
     if (this.books.length === 0) {
       this.catalogGrid.innerHTML = `
         <div class="empty-state">
-          <p>> NO DATA FOUND FOR THIS TERM.</p>
+          <p>> NENHUM DADO ENCONTRADO PARA ESTE TERMO.</p>
         </div>
       `;
       return;
@@ -220,7 +230,7 @@ export class Catalog {
       const img = document.createElement('img');
       img.className = 'cover';
       img.loading = 'lazy';
-      img.alt = `Book cover: ${book.title}`;
+      img.alt = `Capa do livro: ${book.title}`;
       img.src = imgUrl;
       c.appendChild(img);
     } else {
@@ -233,7 +243,7 @@ export class Catalog {
     const meta = document.createElement('div');
     meta.className = 'meta';
     
-    const authorNames = book.authors?.map(a => a.name.split(',').reverse().join(' ').trim()).join(', ') || 'Unknown Author';
+    const authorNames = book.authors?.map(a => a.name.split(',').reverse().join(' ').trim()).join(', ') || 'Autor Desconhecido';
     
     meta.innerHTML = `
       <div class="meta-title">${this.escape(book.title)}</div>
@@ -257,20 +267,20 @@ export class Catalog {
     
     let coverHtml = '';
     if (imgUrl) {
-      coverHtml = `<img class="cover-img" src="${imgUrl}" alt="Featured: ${this.escape(book.title)}">`;
+      coverHtml = `<img class="cover-img" src="${imgUrl}" alt="Em Destaque: ${this.escape(book.title)}">`;
     } else {
       coverHtml = `<div class="css-cover featured-fallback"><div class="title">${this.escape(book.title)}</div></div>`;
     }
 
-    const authorNames = book.authors?.map(a => a.name.split(',').reverse().join(' ').trim()).join(', ') || 'Unknown Author';
+    const authorNames = book.authors?.map(a => a.name.split(',').reverse().join(' ').trim()).join(', ') || 'Autor Desconhecido';
 
     this.featuredCard.innerHTML = `
       ${coverHtml}
       <div class="featured-overlay">
-        <div class="featured-tag">> SYS_PICK</div>
+        <div class="featured-tag">> SELEÇÃO DO SISTEMA</div>
         <h3 class="featured-title">${this.escape(book.title)}</h3>
-        <p class="featured-author">by ${this.escape(authorNames)}</p>
-        <button class="btn btn-primary btn-pixel" id="btn-read-featured">BOOT_READER</button>
+        <p class="featured-author">por ${this.escape(authorNames)}</p>
+        <button class="btn btn-primary btn-pixel" id="btn-read-featured">INICIAR LEITURA</button>
       </div>
     `;
 
@@ -288,7 +298,7 @@ export class Catalog {
     
     const prevBtn = document.createElement('button');
     prevBtn.className = `btn btn-outline btn-pixel-sm ${this.page === 1 ? 'disabled' : ''}`;
-    prevBtn.textContent = 'PREV';
+    prevBtn.textContent = 'ANTERIOR';
     prevBtn.disabled = this.page === 1;
     prevBtn.addEventListener('click', () => {
       if (this.page > 1) {
@@ -300,12 +310,12 @@ export class Catalog {
 
     const info = document.createElement('span');
     info.className = 'page-info';
-    info.textContent = `SECTOR ${this.page}/${totalPages}`;
+    info.textContent = `SETOR ${this.page}/${totalPages}`;
     this.paginationControls.appendChild(info);
 
     const nextBtn = document.createElement('button');
     nextBtn.className = `btn btn-outline btn-pixel-sm ${this.page === totalPages ? 'disabled' : ''}`;
-    nextBtn.textContent = 'NEXT';
+    nextBtn.textContent = 'PRÓXIMO';
     nextBtn.disabled = this.page === totalPages;
     nextBtn.addEventListener('click', () => {
       if (this.page < totalPages) {
@@ -320,11 +330,11 @@ export class Catalog {
     this.catalogGrid.innerHTML = `
       <div class="error-container pixel-card">
         <div class="error-icon">⚡</div>
-        <p class="error-message">CONNECTION TIMEOUT: EXTERNAL SERVER NOT RESPONDING.</p>
-        <button class="btn btn-primary btn-pixel" id="btn-retry-catalog">REBOOT CONSOLE</button>
+        <p class="error-message">TIMEOUT DE CONEXÃO: SERVIDOR EXTERNO SEM RESPOSTA.</p>
+        <button class="btn btn-primary btn-pixel" id="btn-retry-catalog">REINICIAR CONSOLE</button>
       </div>
     `;
-    this.featuredCard.innerHTML = `<div class="featured-placeholder error">API_ERROR</div>`;
+    this.featuredCard.innerHTML = `<div class="featured-placeholder error">ERRO_DE_API</div>`;
 
     document.getElementById('btn-retry-catalog').addEventListener('click', () => {
       this.loadCatalog();

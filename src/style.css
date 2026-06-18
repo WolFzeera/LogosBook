@@ -1,20 +1,20 @@
 /* ==========================================================================
-   DESIGN SYSTEM - BITS COLORIDOS (RETRO ARCADE / 8-BIT NEON)
+   DESIGN SYSTEM - BITS COLORIDOS (RETRO ARCADE / 8-BIT DARK)
    ========================================================================== */
 :root {
-  /* Cores Globais - Paleta Retro Cyberpunk */
-  --bg-main: #030305;
-  --surface: #0a0a10;
-  --surface-border: #ff007f; /* Magenta neon */
+  /* Cores Globais - Paleta Retro Dark Cyberpunk */
+  --bg-main: #040408;
+  --surface: #08080f;
+  --surface-border: #8b0050; /* Magenta escuro */
   
-  --text-primary: #00f0ff; /* Ciano neon */
-  --text-muted: #8a9fc4;
-  --accent: #fffb00; /* Amarelo retro */
-  --accent-glow: rgba(255, 251, 0, 0.25);
+  --text-primary: #00a8b5; /* Ciano apagado */
+  --text-muted: #4a5a78;
+  --accent: #b8a800; /* Amarelo retro escuro */
+  --accent-glow: rgba(184, 168, 0, 0.15);
   
-  --neon-green: #39ff14; /* Verde fosforescente */
-  --neon-magenta: #ff007f;
-  --neon-cyan: #00f0ff;
+  --neon-green: #1a8a06; /* Verde escuro */
+  --neon-magenta: #8b0050;
+  --neon-cyan: #007b87;
 
   --font-retro-header: 'Press Start 2P', monospace;
   --font-retro-reader: 'Share Tech Mono', monospace;
@@ -24,12 +24,12 @@
   
   --scanlines: linear-gradient(
     rgba(18, 16, 16, 0) 50%, 
-    rgba(0, 0, 0, 0.25) 50%
+    rgba(0, 0, 0, 0.15) 50%
   ), linear-gradient(
     90deg, 
-    rgba(255, 0, 0, 0.06), 
-    rgba(0, 255, 0, 0.02), 
-    rgba(0, 0, 255, 0.06)
+    rgba(255, 0, 0, 0.03), 
+    rgba(0, 255, 0, 0.01), 
+    rgba(0, 0, 255, 0.03)
   );
   --scanlines-size: 100% 4px, 6px 100%;
 }
@@ -63,7 +63,7 @@ body::before {
   background-size: var(--scanlines-size);
   z-index: 9999;
   pointer-events: none;
-  opacity: 0.45;
+  opacity: 0.25;
 }
 
 /* Scrollbar Pixelada */
@@ -192,7 +192,7 @@ body::before {
   font-size: 30px;
   line-height: 1.3;
   color: var(--accent);
-  text-shadow: 3px 3px 0px var(--neon-magenta);
+  text-shadow: 3px 3px 0px var(--neon-magenta), 0 0 20px rgba(184,168,0,0.2);
   margin-bottom: 16px;
 }
 
@@ -512,18 +512,18 @@ body::before {
 
 /* --- TEMA ESCURO (CYBER NEON ARCADE) --- */
 .reader-container.theme-dark {
-  --reader-bg: #000000;
-  --reader-text: #00f0ff; /* Ciano */
-  --reader-meta: #ff007f; /* Magenta */
-  --reader-border: #00f0ff;
-  --reader-sidebar-bg: #08080c;
-  --reader-accent: #fffb00; /* Amarelo */
-  --reader-control-bg: #000;
+  --reader-bg: #03030a;
+  --reader-text: #00a8b5; /* Ciano escuro */
+  --reader-meta: #7a0045; /* Magenta escuro */
+  --reader-border: #007b87;
+  --reader-sidebar-bg: #060610;
+  --reader-accent: #b8a800; /* Amarelo escuro */
+  --reader-control-bg: #03030a;
   
   background-color: var(--reader-bg);
   color: var(--reader-text);
   border: 8px double var(--reader-border);
-  text-shadow: 0 0 5px rgba(0, 240, 255, 0.35);
+  text-shadow: 0 0 3px rgba(0, 168, 181, 0.2);
 }
 
 /* Custom class for pixel borders in reader buttons */

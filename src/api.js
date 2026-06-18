@@ -11,7 +11,8 @@ const MOCK_BOOKS = [
       "text/plain; charset=utf-8": "mock://frankenstein"
     },
     subjects: ["Horror", "Science Fiction", "Gothic"],
-    languages: ["en"]
+    languages: ["en"],
+    download_count: 5000
   },
   {
     id: 99902,
@@ -22,7 +23,8 @@ const MOCK_BOOKS = [
       "text/plain; charset=utf-8": "mock://dracula"
     },
     subjects: ["Vampires", "Horror", "Gothic"],
-    languages: ["en"]
+    languages: ["en"],
+    download_count: 4500
   },
   {
     id: 99903,
@@ -33,7 +35,8 @@ const MOCK_BOOKS = [
       "text/plain; charset=utf-8": "mock://alice"
     },
     subjects: ["Fantasy", "Children", "Classics"],
-    languages: ["en"]
+    languages: ["en"],
+    download_count: 6000
   }
 ];
 
@@ -114,14 +117,16 @@ export async function fetchBookById(id) {
 
 /**
  * Busca livros na API Gutendex.
- * Inclui tratamento de erro robusto e fallback para Mock JSON local.
+ * Por padrão busca obras clássicas populares. Inclui tratamento de erro robusto e fallback para Mock JSON local.
  */
 export async function fetchBooks(query = '', page = 1) {
   try {
-    let url = `${GUTENDEX_API}?page=${page}`;
-    if (query) {
+    // Monta a URL: busca por termo, ordenando por popularidade (downloads)
+    let url = `${GUTENDEX_API}?page=${page}&sort=popular`;
+    if (query && query !== 'classicos') {
       url += `&search=${encodeURIComponent(query)}`;
     }
+    
     const response = await fetch(url);
     if (!response.ok) throw new Error('Limite de requisições excedido ou API indisponível.');
     const data = await response.json();

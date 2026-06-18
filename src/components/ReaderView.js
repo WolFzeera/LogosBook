@@ -49,15 +49,15 @@ export class ReaderView {
   }
 
   /**
-   * Renderiza a interface do Reader com estética Retrô/Arcade ("Bits Coloridos").
+   * Renderiza a interface do Reader com estética Retrô/Arcade (Bits Coloridos).
    */
   render() {
     if (this.isLoading) {
       this.container.innerHTML = `
         <div class="reader-loading-screen pixel-layout">
           <div class="spinner pixel-spinner"></div>
-          <p class="blink">LOADING DATA...</p>
-          <span class="loading-subtitle">> LENDO SETORES DE MEMORIA</span>
+          <p class="blink">CARREGANDO DADOS...</p>
+          <span class="loading-subtitle">> LENDO SETORES DE MEMÓRIA</span>
         </div>
       `;
       return;
@@ -66,11 +66,11 @@ export class ReaderView {
     if (this.errorMessage) {
       this.container.innerHTML = `
         <div class="reader-error-screen pixel-layout">
-          <div class="error-badge">ERR_CORS</div>
-          <h2>LOAD FAILED</h2>
+          <div class="error-badge">ERRO_CORS</div>
+          <h2>FALHA NO CARREGAMENTO</h2>
           <p>${this.errorMessage}</p>
           <div class="error-actions">
-            <button class="btn btn-primary btn-pixel" id="btn-reader-close-error">RETURN TO HUB</button>
+            <button class="btn btn-primary btn-pixel" id="btn-reader-close-error">VOLTAR AO MENU</button>
           </div>
         </div>
       `;
@@ -82,23 +82,23 @@ export class ReaderView {
     if (!book) return;
 
     const currentText = this.isTranslated 
-      ? (this.reader.translationCache[this.reader.currentPageIndex] || 'TRANSLATING PAGE CONTENT...') 
+      ? (this.reader.translationCache[this.reader.currentPageIndex] || 'TRADUZINDO CONTEÚDO DA PÁGINA...') 
       : this.reader.getCurrentPageText();
 
-    const authorNames = book.authors?.map(a => a.name.split(',').reverse().join(' ').trim()).join(', ') || 'Unknown Author';
+    const authorNames = book.authors?.map(a => a.name.split(',').reverse().join(' ').trim()).join(', ') || 'Autor Desconhecido';
 
     this.container.innerHTML = `
       <div class="reader-container pixel-layout" id="reader-layout">
         
         <!-- Header Arcade -->
         <header class="reader-header">
-          <button class="btn-close-reader btn-pixel-sm" id="btn-close-reader" title="Return to Menu">ESC</button>
+          <button class="btn-close-reader btn-pixel-sm" id="btn-close-reader" title="Voltar ao Menu">ESC</button>
           <div class="reader-header-meta">
             <h2 class="reader-book-title">${this.escape(book.title)}</h2>
-            <span class="reader-book-author">> AUTHOR: ${this.escape(authorNames)}</span>
+            <span class="reader-book-author">> AUTOR: ${this.escape(authorNames)}</span>
           </div>
           <div class="reader-progress-bubble" id="progress-indicator">
-            READ: ${this.reader.getProgressString()}
+            LIDO: ${this.reader.getProgressString()}
           </div>
         </header>
 
@@ -106,43 +106,43 @@ export class ReaderView {
           <!-- Sidebar de Controles Retro (Bits Coloridos) -->
           <aside class="reader-sidebar">
             <div class="sidebar-section">
-              <h4 class="sidebar-title">[01] COLOR THEME</h4>
+              <h4 class="sidebar-title">[01] TEMA DE COR</h4>
               <div class="theme-toggles">
-                <button class="theme-btn theme-light-btn" data-theme="light" title="GameBoy Theme"></button>
-                <button class="theme-btn theme-sepia-btn" data-theme="sepia" title="Amber Terminal"></button>
+                <button class="theme-btn theme-light-btn" data-theme="light" title="Tema GameBoy"></button>
+                <button class="theme-btn theme-sepia-btn" data-theme="sepia" title="Terminal Âmbar"></button>
                 <button class="theme-btn theme-dark-btn" data-theme="dark" title="Cyber Neon"></button>
               </div>
               
-              <h4 class="sidebar-title" style="margin-top: 8px;">[02] FONT RESIZER</h4>
+              <h4 class="sidebar-title" style="margin-top: 8px;">[02] TAMANHO DA FONTE</h4>
               <div class="font-resizers">
-                <button class="font-btn" id="btn-font-decrease" title="Shrink Font">A-</button>
+                <button class="font-btn" id="btn-font-decrease" title="Diminuir Fonte">A-</button>
                 <span class="font-indicator" id="font-size-text">${Math.round(this.reader.fontSizeRem * 100)}%</span>
-                <button class="font-btn" id="btn-font-increase" title="Grow Font">A+</button>
+                <button class="font-btn" id="btn-font-increase" title="Aumentar Fonte">A+</button>
               </div>
             </div>
 
             <hr class="sidebar-divider">
 
             <div class="sidebar-section">
-              <h4 class="sidebar-title">[03] TRANSLATOR</h4>
+              <h4 class="sidebar-title">[03] TRADUÇÃO</h4>
               <button class="btn btn-full btn-pixel ${this.isTranslated ? 'btn-translated' : ''}" id="btn-translate-page">
-                ${this.translating ? 'LOADING...' : (this.isTranslated ? 'ENGLISH' : 'PORTUGUESE')}
+                ${this.translating ? 'TRADUZINDO...' : (this.isTranslated ? 'VER ORIGINAL' : 'TRADUZIR PT-BR')}
               </button>
             </div>
 
             <hr class="sidebar-divider">
 
             <div class="sidebar-section">
-              <h4 class="sidebar-title">[04] VOICE DECODER</h4>
+              <h4 class="sidebar-title">[04] DECODIFICADOR DE VOZ</h4>
               
               <div class="tts-voice-wrapper">
-                <label for="tts-voice-select">VOICE CHIP</label>
+                <label for="tts-voice-select">CHIP DE VOZ</label>
                 <select id="tts-voice-select" class="tts-select"></select>
               </div>
 
               <div class="tts-range-group">
                 <div class="range-header">
-                  <label for="tts-rate-range">SPEED</label>
+                  <label for="tts-rate-range">VELOCIDADE</label>
                   <span id="rate-value">${this.tts.rate.toFixed(1)}x</span>
                 </div>
                 <input type="range" id="tts-rate-range" min="0.5" max="2" step="0.1" value="${this.tts.rate}">
@@ -150,15 +150,15 @@ export class ReaderView {
 
               <div class="tts-range-group">
                 <div class="range-header">
-                  <label for="tts-pitch-range">PITCH</label>
+                  <label for="tts-pitch-range">TOM</label>
                   <span id="pitch-value">${this.tts.pitch.toFixed(1)}</span>
                 </div>
                 <input type="range" id="tts-pitch-range" min="0.5" max="2" step="0.1" value="${this.tts.pitch}">
               </div>
 
               <div class="tts-player-controls">
-                <button class="player-btn btn-pixel-sm" id="tts-play-btn" title="Speak Page">PLAY</button>
-                <button class="player-btn btn-pixel-sm" id="tts-stop-btn" title="Mute Audio" disabled>STOP</button>
+                <button class="player-btn btn-pixel-sm" id="tts-play-btn" title="Narrar Página">PLAY</button>
+                <button class="player-btn btn-pixel-sm" id="tts-stop-btn" title="Silenciar Áudio" disabled>PARAR</button>
               </div>
             </div>
           </aside>
@@ -176,11 +176,11 @@ export class ReaderView {
         <!-- Rodapé Retro -->
         <footer class="reader-footer">
           <div class="reader-footer-inner">
-            <button class="btn-nav btn-pixel-sm" id="btn-prev-page" ${this.reader.currentPageIndex === 0 ? 'disabled' : ''}>PREV</button>
+            <button class="btn-nav btn-pixel-sm" id="btn-prev-page" ${this.reader.currentPageIndex === 0 ? 'disabled' : ''}>ANTERIOR</button>
             <span class="page-numbers" id="page-numbers-text">
-              PAGE ${this.reader.currentPageIndex + 1} OF ${this.reader.pages.length}
+              PÁGINA ${this.reader.currentPageIndex + 1} DE ${this.reader.pages.length}
             </span>
-            <button class="btn-nav btn-pixel-sm" id="btn-next-page" ${this.reader.currentPageIndex === this.reader.pages.length - 1 ? 'disabled' : ''}>NEXT</button>
+            <button class="btn-nav btn-pixel-sm" id="btn-next-page" ${this.reader.currentPageIndex === this.reader.pages.length - 1 ? 'disabled' : ''}>PRÓXIMA</button>
           </div>
           <div class="reader-progress-bar-container">
             <div class="reader-progress-bar-fill" id="progress-bar-fill" style="width: ${this.reader.getProgressString()};"></div>
@@ -202,7 +202,7 @@ export class ReaderView {
       this.onClose();
     });
 
-    // Botoes de Navegação
+    // Botões de Navegação
     document.getElementById('btn-prev-page').addEventListener('click', () => this.navigatePage(-1));
     document.getElementById('btn-next-page').addEventListener('click', () => this.navigatePage(1));
 
@@ -220,13 +220,13 @@ export class ReaderView {
     document.getElementById('btn-font-decrease').addEventListener('click', () => {
       this.reader.changeFontSize(-0.15);
       this.applyThemeAndFont();
-      this.rebindSwipe(); // Recarrega os swipes se as páginas mudarem
+      this.rebindSwipe();
     });
     
     document.getElementById('btn-font-increase').addEventListener('click', () => {
       this.reader.changeFontSize(0.15);
       this.applyThemeAndFont();
-      this.rebindSwipe(); // Recarrega os swipes se as páginas mudarem
+      this.rebindSwipe();
     });
 
     // Tradução
@@ -340,7 +340,7 @@ export class ReaderView {
     this.translating = true;
     const translateBtn = document.getElementById('btn-translate-page');
     if (translateBtn) {
-      translateBtn.textContent = 'DECODING...';
+      translateBtn.textContent = 'DECODIFICANDO...';
       translateBtn.classList.add('translating');
     }
 
@@ -365,7 +365,7 @@ export class ReaderView {
     const voices = this.tts.getAvailableVoices();
     
     if (voices.length === 0) {
-      voiceSelect.innerHTML = '<option value="">VOICE CHIP ERROR</option>';
+      voiceSelect.innerHTML = '<option value="">ERRO NO CHIP DE VOZ</option>';
       return;
     }
 
@@ -429,7 +429,7 @@ export class ReaderView {
         playBtn.classList.remove('blink');
         pageEl?.classList.remove('voice-reading-active');
       } else {
-        playBtn.textContent = 'PAUSE';
+        playBtn.textContent = 'PAUSAR';
         playBtn.classList.add('blink');
         pageEl?.classList.add('voice-reading-active');
       }
