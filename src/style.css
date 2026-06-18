@@ -444,6 +444,25 @@ body::before {
   text-overflow: ellipsis;
 }
 
+.meta-source {
+  font-size: 6px;
+  color: var(--text-muted);
+  margin-bottom: 3px;
+  letter-spacing: 0.05em;
+}
+
+/* Barra de fontes ativas */
+.source-badge {
+  font-family: var(--font-retro-header);
+  font-size: 7px;
+  color: var(--neon-green);
+  padding: 6px 0;
+  margin-bottom: 16px;
+  border-bottom: 1px dashed var(--neon-green);
+  opacity: 0.6;
+}
+
+
 /* Pagination Info */
 .page-info {
   font-size: 9px;

@@ -1,7 +1,7 @@
 import { fetchBooks } from '../api.js';
 
-// Mínimo de downloads para garantir que o livro é completo e relevante
-const MIN_DOWNLOADS = 50;
+
+
 
 export class Catalog {
   constructor(appContainer, onBookSelect) {
@@ -16,12 +16,14 @@ export class Catalog {
 
     this.genres = [
       { key: 'filosofia', label: 'FILOSOFIA' },
-      { key: 'ficcao', label: 'FICÇÃO' },
+      { key: 'romance', label: 'ROMANCE' },
       { key: 'poesia', label: 'POESIA' },
       { key: 'historia', label: 'HISTÓRIA' },
-      { key: 'romance', label: 'ROMANCE' },
+      { key: 'contos', label: 'CONTOS' },
       { key: 'ciencia', label: 'CIÊNCIA' },
-      { key: 'drama', label: 'DRAMA' }
+      { key: 'drama', label: 'DRAMA' },
+      { key: 'aventura', label: 'AVENTURA' },
+      { key: 'misterio', label: 'MISTÉRIO' }
     ];
 
     this.debounceTimeout = null;
@@ -171,17 +173,11 @@ export class Catalog {
       const searchTerm = this.query || this.activeGenre || 'classicos';
       const data = await fetchBooks(searchTerm, this.page);
       
-      // Filtra livros com downloads mínimos (garantia de livro completo)
-      const allResults = data.results || [];
-      const filtered = allResults.filter(book => {
-        const downloads = book.download_count || 0;
-        return downloads >= MIN_DOWNLOADS;
-      });
-
-      this.books = filtered;
+      this.books = data.results || [];
       this.loading = false;
       this.renderBooksGrid();
       this.renderPagination(data.count);
+      this.renderSourceBadge(data.sources || []);
 
       if (this.page === 1 && this.books.length > 0 && !this.query) {
         this.setFeatured(this.books[0]);
@@ -208,6 +204,7 @@ export class Catalog {
       this.catalogGrid.innerHTML = `
         <div class="empty-state">
           <p>> NENHUM DADO ENCONTRADO PARA ESTE TERMO.</p>
+          <p style="font-size:8px;margin-top:12px;color:var(--text-muted)">Tente outra busca ou selecione um gênero diferente.</p>
         </div>
       `;
       return;
@@ -224,7 +221,8 @@ export class Catalog {
     c.className = 'card pixel-card';
     c.tabIndex = 0;
 
-    const imgUrl = book.formats['image/jpeg'] || book.formats['image/jpg'] || book.formats['image/png'];
+    // Usa coverUrl normalizado (campo unificado)
+    const imgUrl = book.coverUrl;
     
     if (imgUrl) {
       const img = document.createElement('img');
@@ -232,6 +230,7 @@ export class Catalog {
       img.loading = 'lazy';
       img.alt = `Capa do livro: ${book.title}`;
       img.src = imgUrl;
+      img.onerror = () => { img.style.display = 'none'; };
       c.appendChild(img);
     } else {
       const fallback = document.createElement('div');
@@ -244,8 +243,10 @@ export class Catalog {
     meta.className = 'meta';
     
     const authorNames = book.authors?.map(a => a.name.split(',').reverse().join(' ').trim()).join(', ') || 'Autor Desconhecido';
+    const sourceLabel = this.getSourceLabel(book.source);
     
     meta.innerHTML = `
+      <div class="meta-source">${sourceLabel}</div>
       <div class="meta-title">${this.escape(book.title)}</div>
       <div class="meta-sub">> ${this.escape(authorNames)}</div>
     `;
@@ -259,25 +260,53 @@ export class Catalog {
     return c;
   }
 
+  getSourceLabel(source) {
+    const labels = {
+      'gutendex': '[GUTENBERG]',
+      'openlibrary': '[OPEN LIB]',
+      'archive': '[ARCHIVE]'
+    };
+    return labels[source] || '[???]';
+  }
+
+  renderSourceBadge(sources) {
+    // Remove badge anterior
+    const old = document.getElementById('source-badge');
+    if (old) old.remove();
+
+    if (!sources || sources.length === 0) return;
+
+    const badge = document.createElement('div');
+    badge.id = 'source-badge';
+    badge.className = 'source-badge';
+    badge.textContent = `FONTES ATIVAS: ${sources.join(' + ')}`;
+
+    const sectionHeader = document.querySelector('.section-header');
+    if (sectionHeader) {
+      sectionHeader.insertAdjacentElement('afterend', badge);
+    }
+  }
+
   setFeatured(book) {
     this.featuredBook = book;
     this.featuredCard.innerHTML = '';
     
-    const imgUrl = book.formats['image/jpeg'] || book.formats['image/jpg'] || book.formats['image/png'];
+    const imgUrl = book.coverUrl;
     
     let coverHtml = '';
     if (imgUrl) {
-      coverHtml = `<img class="cover-img" src="${imgUrl}" alt="Em Destaque: ${this.escape(book.title)}">`;
+      coverHtml = `<img class="cover-img" src="${imgUrl}" alt="Em Destaque: ${this.escape(book.title)}" onerror="this.style.display='none'">`;
     } else {
       coverHtml = `<div class="css-cover featured-fallback"><div class="title">${this.escape(book.title)}</div></div>`;
     }
 
     const authorNames = book.authors?.map(a => a.name.split(',').reverse().join(' ').trim()).join(', ') || 'Autor Desconhecido';
+    const sourceLabel = this.getSourceLabel(book.source);
 
     this.featuredCard.innerHTML = `
       ${coverHtml}
       <div class="featured-overlay">
-        <div class="featured-tag">> SELEÇÃO DO SISTEMA</div>
+        <div class="featured-tag">> SELEÇÃO DO SISTEMA ${sourceLabel}</div>
         <h3 class="featured-title">${this.escape(book.title)}</h3>
         <p class="featured-author">por ${this.escape(authorNames)}</p>
         <button class="btn btn-primary btn-pixel" id="btn-read-featured">INICIAR LEITURA</button>
