@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  base: '/bibliotecadigital/',
+  base: '/LogosBook/',
   server: {
     port: 5173
   }
