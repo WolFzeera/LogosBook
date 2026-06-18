@@ -10,6 +10,7 @@ export class ReaderView {
     
     this.isLoading = false;
     this.isTranslated = false;
+    this.isTranslationActive = false;
     this.translating = false;
     this.errorMessage = '';
   }
@@ -20,6 +21,7 @@ export class ReaderView {
   async open(book) {
     this.isLoading = true;
     this.isTranslated = false;
+    this.isTranslationActive = false;
     this.errorMessage = '';
     this.render();
 
@@ -125,8 +127,8 @@ export class ReaderView {
 
             <div class="sidebar-section">
               <h4 class="sidebar-title">[03] TRADUÇÃO</h4>
-              <button class="btn btn-full btn-pixel ${this.isTranslated ? 'btn-translated' : ''}" id="btn-translate-page">
-                ${this.translating ? 'TRADUZINDO...' : (this.isTranslated ? 'VER ORIGINAL' : 'TRADUZIR PT-BR')}
+              <button class="btn btn-full btn-pixel ${this.isTranslationActive ? 'btn-translated' : ''}" id="btn-translate-page">
+                ${this.translating ? 'TRADUZINDO...' : (this.isTranslationActive ? 'VER ORIGINAL' : 'TRADUZIR PT-BR')}
               </button>
             </div>
 
@@ -282,8 +284,12 @@ export class ReaderView {
 
     this.reader.onPageChange = () => {
       this.tts.stop();
-      this.isTranslated = false;
-      this.render();
+      if (this.isTranslationActive) {
+        this.ensurePageTranslation();
+      } else {
+        this.isTranslated = false;
+        this.render();
+      }
     };
   }
 
@@ -319,15 +325,7 @@ export class ReaderView {
     }, 220);
   }
 
-  async toggleTranslation() {
-    if (this.translating) return;
-
-    if (this.isTranslated) {
-      this.isTranslated = false;
-      this.render();
-      return;
-    }
-
+  async ensurePageTranslation() {
     const pageIdx = this.reader.currentPageIndex;
     const cached = this.reader.translationCache[pageIdx];
 
@@ -338,23 +336,35 @@ export class ReaderView {
     }
 
     this.translating = true;
-    const translateBtn = document.getElementById('btn-translate-page');
-    if (translateBtn) {
-      translateBtn.textContent = 'DECODIFICANDO...';
-      translateBtn.classList.add('translating');
-    }
+    this.isTranslated = true;
+    this.render();
 
     try {
       const originalText = this.reader.getCurrentPageText();
       const translated = await translateTextToPt(originalText);
       this.reader.translationCache[pageIdx] = translated;
-      this.isTranslated = true;
     } catch (e) {
-      alert('ERRO DE PROTOCOLO: FALHA NA TRADUÇÃO.');
+      console.error('Falha de tradução:', e);
+      // Fallback para texto original
+      this.reader.translationCache[pageIdx] = this.reader.getCurrentPageText();
     } finally {
       this.translating = false;
       this.render();
     }
+  }
+
+  async toggleTranslation() {
+    if (this.translating) return;
+
+    if (this.isTranslationActive) {
+      this.isTranslationActive = false;
+      this.isTranslated = false;
+      this.render();
+      return;
+    }
+
+    this.isTranslationActive = true;
+    await this.ensurePageTranslation();
   }
 
   setupTTSVoices() {

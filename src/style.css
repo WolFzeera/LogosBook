@@ -63,7 +63,7 @@ body::before {
   background-size: var(--scanlines-size);
   z-index: 9999;
   pointer-events: none;
-  opacity: 0.25;
+  opacity: 0.15;
 }
 
 /* Scrollbar Pixelada */
@@ -192,7 +192,7 @@ body::before {
   font-size: 30px;
   line-height: 1.3;
   color: var(--accent);
-  text-shadow: 3px 3px 0px var(--neon-magenta), 0 0 20px rgba(184,168,0,0.2);
+  text-shadow: 3px 3px 0px var(--neon-magenta), 5px 5px 0px rgba(0,0,0,0.5);
   margin-bottom: 16px;
 }
 
@@ -469,6 +469,48 @@ body::before {
   color: var(--text-muted);
 }
 
+/* Contador total de obras */
+.total-count {
+  font-family: var(--font-retro-header);
+  font-size: 7px;
+  color: var(--neon-green);
+  opacity: 0.7;
+}
+
+/* Sentinel invisible do IntersectionObserver */
+.scroll-sentinel {
+  width: 100%;
+  height: 1px;
+  visibility: hidden;
+}
+
+/* Spinner de carregamento de mais livros */
+.load-more-spinner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  gap: 16px;
+  font-size: 8px;
+  color: var(--text-muted);
+}
+
+/* Mensagem de fim do catálogo */
+.catalog-end-msg {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 24px;
+  font-family: var(--font-retro-header);
+  font-size: 8px;
+  color: var(--text-muted);
+  border-top: 2px dashed var(--text-muted);
+  margin-top: 16px;
+  opacity: 0.6;
+}
+
+
 /* Skeletons Retro */
 .skeleton {
   border: 3px dashed var(--text-muted);
@@ -526,7 +568,7 @@ body::before {
   background-color: var(--reader-bg);
   color: var(--reader-text);
   border: 8px double var(--reader-border);
-  text-shadow: 0 0 4px rgba(255, 176, 0, 0.4);
+  text-shadow: none;
 }
 
 /* --- TEMA ESCURO (CYBER NEON ARCADE) --- */
@@ -542,7 +584,7 @@ body::before {
   background-color: var(--reader-bg);
   color: var(--reader-text);
   border: 8px double var(--reader-border);
-  text-shadow: 0 0 3px rgba(0, 168, 181, 0.2);
+  text-shadow: none;
 }
 
 /* Custom class for pixel borders in reader buttons */
@@ -857,6 +899,14 @@ body::before {
 .reader-loading-screen, .reader-error-screen {
   background: #000;
   color: var(--neon-cyan);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  text-align: center;
+  padding: 24px;
 }
 
 .error-badge {
@@ -905,4 +955,23 @@ body::before {
   .book-page {
     font-size: calc(var(--reader-font-size) - 0.1rem);
   }
+}
+
+/* ==========================================================================
+   PAGINATION CONTROLS
+   ========================================================================== */
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pagination-controls-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 3px double var(--surface-border);
 }
